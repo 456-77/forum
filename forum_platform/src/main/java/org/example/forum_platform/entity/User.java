@@ -1,5 +1,7 @@
 package org.example.forum_platform.entity;
 import jakarta.persistence.*;
+
+import java.io.Serializable;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -28,6 +30,8 @@ public class User {
     private Integer points = 0;
 
     private String role = "USER"; // USER, MODERATOR, ADMIN
+
+    private Integer level = 1;
 
     private LocalDateTime createTime = LocalDateTime.now();
 
@@ -59,6 +63,30 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return String.valueOf(id);
+    }
+
+    public Serializable getPhone() {
+        return phone;
+    }
+
+    public Object getAvatar() {
+        return avatar;
+    }
+
+    public Object getEmail() {
+        return email;
+    }
+
+    public Object getPoints() {
+        return points;
+    }
+
+    public Object getlevel() {
+        return level;
     }
 
     // getters and setters

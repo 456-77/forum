@@ -1,18 +1,18 @@
 package org.example.forum_platform.service;
 
+import org.example.forum_platform.dto.RegisterRequest;
 import org.example.forum_platform.entity.User;
 import org.example.forum_platform.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
-public class UserService implements UserDetailsService {
+@Transactional
+public class UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -21,8 +21,14 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     // 注册用户
-    public User register(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public User register(RegisterRequest request) {
+        User user = new User();
+        // 检查用户名是否已存在
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new RuntimeException("用户名已存在: " + user.getUsername());
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
         return userRepository.save(user);
     }
@@ -44,16 +50,8 @@ public class UserService implements UserDetailsService {
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
 
-        // 将我们的 User 实体转换为 Spring Security 的 UserDetails
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole())  // 会自动添加 "ROLE_" 前缀
-                .build();
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

@@ -3,6 +3,7 @@ package org.example.forum_platform.controller;
 import org.example.forum_platform.entity.User;
 import org.example.forum_platform.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -14,17 +15,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 用户注册
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return userService.register(user);
-    }
-
-    // 用户登录
-    @PostMapping("/login")
-    public Optional<User> login(@RequestParam String username, @RequestParam String password) {
-        return userService.login(username, password);
-    }
 
     // 更新资料
     @PutMapping("/{id}")
@@ -37,5 +27,11 @@ public class UserController {
     @GetMapping("/{id}")
     public Optional<User> getUser(@PathVariable Long id) {
         return userService.findById(id);
+    }
+    // 搜索用户
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsers(@RequestParam String keyword) {
+        // 这里可以调用 userService 的搜索方法
+        return ResponseEntity.ok("搜索用户: " + keyword);
     }
 }
