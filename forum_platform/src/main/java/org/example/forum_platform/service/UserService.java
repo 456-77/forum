@@ -22,14 +22,32 @@ public class UserService {
 
     // 注册用户
     public User register(RegisterRequest request) {
-        User user = new User();
-        // 检查用户名是否已存在
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("用户名已存在: " + user.getUsername());
+        // 验证必要字段
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("用户名不能为空");
         }
 
+        // 检查用户名是否已存在
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new RuntimeException("用户名已存在: " + request.getUsername());
+        }
+
+        // 创建并设置用户信息
+        User user = new User();
+        user.setUsername(request.getUsername().trim());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
+        user.setPoints(0);
+        user.setLevel(1);
+
+        // 设置可选字段
+        if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            user.setEmail(request.getEmail().trim());
+        }
+        if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
+            user.setPhone(request.getPhone().trim());
+        }
+
         return userRepository.save(user);
     }
 

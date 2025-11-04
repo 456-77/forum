@@ -85,8 +85,28 @@ public class User {
         return points;
     }
 
-    public Object getlevel() {
+    public Object getLevel() {
         return level;
+    }
+
+    public void setUsername(String trim) {
+        this.username = trim;
+    }
+
+    public void setPoints(int i) {
+        this.points = i;
+    }
+
+    public void setLevel(int i) {
+        this.level = i;
+    }
+
+    public void setEmail(String trim) {
+        this.email = trim;
+    }
+
+    public void setPhone(String trim) {
+        this.phone = trim;
     }
 
     // getters and setters
