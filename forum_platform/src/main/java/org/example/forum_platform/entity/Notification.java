@@ -14,11 +14,18 @@ public class Notification {
 
     private String content;
 
-    private Boolean read = false;
+    private Boolean isRead = false;
 
     private LocalDateTime createTime = LocalDateTime.now();
 
+    //发送者
     @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private User sender;
+
+    // 接收者
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
     private User receiver;
 
 
@@ -47,12 +54,12 @@ public class Notification {
         this.content = content;
     }
 
-    public Boolean getRead() {
-        return read;
+    public Boolean getIsRead() {
+        return isRead;
     }
 
-    public void setRead(Boolean read) {
-        this.read = read;
+    public void setIsRead(Boolean read) {
+        this.isRead = read;
     }
 
     public LocalDateTime getCreateTime() {
@@ -70,4 +77,9 @@ public class Notification {
     public void setReceiver(User receiver) {
         this.receiver = receiver;
     }
-}
+
+    public User getSender() { return sender; }
+
+    public void setSender(User sender) { this.sender = sender; }
+
+    }
