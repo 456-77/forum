@@ -1,5 +1,6 @@
 package org.example.forum_platform.controller;
 
+import org.example.forum_platform.config.JwtTokenUtil;
 import org.example.forum_platform.dto.LoginRequest;
 import org.example.forum_platform.dto.RegisterRequest;
 import org.example.forum_platform.entity.User;
@@ -19,6 +20,8 @@ public class AuthController {
     @Autowired
 
     private UserService userService;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest user) {//使用dto获取注册信息
@@ -44,11 +47,15 @@ public class AuthController {
             Optional<User> user = userService.login(request.getUsername(), request.getPassword());
             if (user.isPresent()) {
                 User foundUser = user.get();
+                // 生成 JWT token
+                String token = jwtTokenUtil.generateToken(foundUser.getUsername());
 
                 // 使用 HashMap 避免问题
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("message", "登录成功");
+                // 返回 token 和用户信息
+                response.put("token", token);
                 response.put("username", foundUser.getUsername());
                 response.put("role", foundUser.getRole());
                 response.put("userId", foundUser.getId());

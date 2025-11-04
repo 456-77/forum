@@ -25,6 +25,8 @@ public class SecurityConfig {
 
     @Autowired
     private SecurityUserDetailsService userDetailsService;
+    @Autowired  // 添加这个注入
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -51,6 +53,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .anyRequest().authenticated()
                 );
+
+
+        // 加入 JWT 过滤器
+        http.addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
