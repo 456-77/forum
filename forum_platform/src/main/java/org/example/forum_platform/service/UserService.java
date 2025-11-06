@@ -62,12 +62,12 @@ public class UserService {
         return Optional.empty();
     }
 
-    // 新增：安全更新用户资料的方法
-    public User updateUserProfile(Long id, UserUpdateDTO updateDTO) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("用户不存在: " + id));
+    // 统一的用户资料更新方法（支持普通用户和管理员）
+    public User updateUserProfile(Long userId, UserUpdateDTO updateDTO, boolean isAdmin) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("用户不存在: " + userId));
 
-        // 验证新用户名是否已存在
+        // 更新基本信息（普通用户和管理员都可以）
         if (updateDTO.getUsername() != null &&
                 !updateDTO.getUsername().equals(user.getUsername())) {
             if (userRepository.findByUsername(updateDTO.getUsername()).isPresent()) {
@@ -76,7 +76,6 @@ public class UserService {
             user.setUsername(updateDTO.getUsername().trim());
         }
 
-        // 验证邮箱是否已存在
         if (updateDTO.getEmail() != null &&
                 !updateDTO.getEmail().equals(user.getEmail())) {
             if (userRepository.findByEmail(updateDTO.getEmail()).isPresent()) {
@@ -85,7 +84,6 @@ public class UserService {
             user.setEmail(updateDTO.getEmail().trim());
         }
 
-        // 验证手机号是否已存在
         if (updateDTO.getPhone() != null &&
                 !updateDTO.getPhone().equals(user.getPhone())) {
             if (userRepository.findByPhone(updateDTO.getPhone()).isPresent()) {
@@ -94,24 +92,74 @@ public class UserService {
             user.setPhone(updateDTO.getPhone().trim());
         }
 
-        // 更新头像
         if (updateDTO.getAvatar() != null) {
             user.setAvatar(updateDTO.getAvatar().trim());
+        }
+
+        // 密码修改逻辑
+        if (updateDTO.getNewPassword() != null && !updateDTO.getNewPassword().trim().isEmpty()) {
+            changePassword(user, updateDTO, isAdmin);
+        }
+
+        // 管理员专用字段（只有管理员可以更新）
+        if (isAdmin) {
+            if (updateDTO.getRole() != null) {
+                user.setRole(updateDTO.getRole());
+            }
+            if (updateDTO.getPoints() != null) {
+                user.setPoints(updateDTO.getPoints());
+            }
+            if (updateDTO.getLevel() != null) {
+                user.setLevel(updateDTO.getLevel());
+            }
         }
 
         return userRepository.save(user);
     }
 
+    // 密码修改逻辑（私有方法）
+    private void changePassword(User user, UserUpdateDTO updateDTO, boolean isAdmin) {
+        String newPassword = updateDTO.getNewPassword().trim();
 
-    // 更新资料
-    public User updateProfile(User user) {
-        return userRepository.save(user);
+        // 验证新密码和确认密码是否一致
+        if (updateDTO.getConfirmPassword() == null ||
+                !newPassword.equals(updateDTO.getConfirmPassword().trim())) {
+            throw new RuntimeException("新密码和确认密码不一致");
+        }
+
+        // 验证密码长度和强度
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("密码长度不能少于6位");
+        }
+
+        if (isAdmin) {
+            // 管理员可以直接修改密码，不需要原密码
+            user.setPassword(passwordEncoder.encode(newPassword));
+        } else {
+            // 普通用户需要验证原密码
+            if (updateDTO.getOldPassword() == null || updateDTO.getOldPassword().trim().isEmpty()) {
+                throw new RuntimeException("原密码不能为空");
+            }
+
+            if (!passwordEncoder.matches(updateDTO.getOldPassword().trim(), user.getPassword())) {
+                throw new RuntimeException("原密码错误");
+            }
+
+            // 新密码不能和原密码相同
+            if (passwordEncoder.matches(newPassword, user.getPassword())) {
+                throw new RuntimeException("新密码不能与原密码相同");
+            }
+
+            user.setPassword(passwordEncoder.encode(newPassword));
+        }
     }
 
+
+    // 根据ID查询用户
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
-
+    // 根据用户名查询用户
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }

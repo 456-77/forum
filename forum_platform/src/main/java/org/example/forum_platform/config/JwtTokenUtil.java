@@ -12,9 +12,11 @@ public class JwtTokenUtil {
     private final long EXPIRATION = 1000 * 60 * 60 * 24; // 24小时
 
     // 生成 token
-    public String generateToken(String username) {
+    public String generateToken(String username, Long userId, String role) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(username)//设置用户名
+                .claim("userId", userId)                 // 用户ID
+                .claim("role", role)                     // 用户角色
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(key)

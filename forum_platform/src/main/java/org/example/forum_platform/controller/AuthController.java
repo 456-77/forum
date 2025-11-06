@@ -47,8 +47,8 @@ public class AuthController {
             Optional<User> user = userService.login(request.getUsername(), request.getPassword());
             if (user.isPresent()) {
                 User foundUser = user.get();
-                // 生成 JWT token
-                String token = jwtTokenUtil.generateToken(foundUser.getUsername());
+                // 生成 JWT token,包含用户名、用户ID和角色信息
+                String token = jwtTokenUtil.generateToken(foundUser.getUsername(), foundUser.getId(), foundUser.getRole());
 
                 // 使用 HashMap 避免问题
                 Map<String, Object> response = new HashMap<>();
