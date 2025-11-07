@@ -5,3 +5,4 @@
 .idea/sqldialects.xml
 .idea/dataSources.xml
 /.vs
+logs/forum-platform.log

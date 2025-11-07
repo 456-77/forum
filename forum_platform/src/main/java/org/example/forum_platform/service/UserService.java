@@ -37,7 +37,7 @@ public class UserService {
         // 创建并设置用户信息
         User user = new User();
         user.setUsername(request.getUsername().trim());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));//对密码进行加密
         user.setRole("USER");
         user.setPoints(0);
         user.setLevel(1);
