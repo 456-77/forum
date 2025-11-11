@@ -7,6 +7,10 @@ public class PostDTO {
     private Long  userId;
     private Long boardId;
     private String images_url;
+    private Long likes;
+    private Long dislikes;
+
+
 
     public String getTitle() {
         return title;
@@ -34,4 +38,17 @@ public class PostDTO {
     public Long getId() {
         return id;
     }
+    public Long getLikes() {
+        return likes;
+    }
+    public void setLikes(Long likes) {
+        this.likes = likes;
+    }
+    public Long getDislikes() {
+        return dislikes;
+    }
+    public void setDislikes(Long dislikes) {
+        this.dislikes = dislikes;
+    }
+
 }

@@ -63,6 +63,16 @@ public class PostService {
         }
         // 更新时间
         post.setUpdateTime(LocalDateTime.now());
+
+        // === 点赞/点踩更新 ===
+        // 只要 DTO 中提供了 likes 或 dislikes，就更新对应字段
+        if (postDTO.getLikes() != null) {
+            post.setLikes((int) Math.max(0, postDTO.getLikes())); // 防止为负数
+        }
+
+        if (postDTO.getDislikes() != null) {
+            post.setDislikes((int) Math.max(0, postDTO.getDislikes()));
+        }
         // 更新所属版块
         if (postDTO.getBoardId() != null) {
             Board board = boardRepository.findById(postDTO.getBoardId())
