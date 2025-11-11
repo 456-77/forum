@@ -20,6 +20,12 @@ public class Post {
 
     private String imageUrl;
 
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer likes = 0;  // 点赞数
+
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer dislikes = 0;  // 点踩数
+
     private LocalDateTime createTime = LocalDateTime.now();
 
     private LocalDateTime updateTime;
@@ -53,6 +59,12 @@ public class Post {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public Integer getLikes() { return likes; }
+    public void setLikes(Integer likes) { this.likes = likes; }
+
+    public Integer getDislikes() { return dislikes; }
+    public void setDislikes(Integer dislikes) { this.dislikes = dislikes; }
 
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
