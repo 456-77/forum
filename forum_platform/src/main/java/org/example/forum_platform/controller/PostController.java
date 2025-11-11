@@ -5,6 +5,7 @@ import org.example.forum_platform.entity.Post;
 import org.example.forum_platform.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,10 +34,25 @@ public class PostController {
             );
         }
     }
-    // 删除帖子
+    //删除帖子
     @DeleteMapping("/{id}")
-    public void deletePost(@PathVariable Long id) {
-        postService.deletePost(id);
+    public ResponseEntity<?> deletePost(@PathVariable Long id, Authentication authentication) {
+        String result = postService.deletePost(id, authentication);
+
+        if ("删除成功".equals(result)) {
+            return ResponseEntity.ok(
+                    java.util.Map.of("success", true, "message", result)
+            );
+        } else if ("帖子不存在".equals(result)) {
+            return ResponseEntity.status(404).body(
+                    java.util.Map.of("success", false, "message", result)
+            );
+
+        } else {
+            return ResponseEntity.status(403).body(
+                    java.util.Map.of("success", false, "message", result)
+            );
+        }
     }
     // 获取版块下的所有帖子
     @GetMapping("/board/{boardId}")

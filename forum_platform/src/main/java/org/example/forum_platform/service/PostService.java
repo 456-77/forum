@@ -8,6 +8,7 @@ import org.example.forum_platform.repository.BoardRepository;
 import org.example.forum_platform.repository.PostRepository;
 import org.example.forum_platform.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -77,13 +78,35 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    // 删除帖子（逻辑删除）
-    public void deletePost(Long postId) {
-        Optional<Post> post = postRepository.findById(postId);
-        post.ifPresent(p -> {
-            p.setDeleted(true);
-            postRepository.save(p);
-        });
+    // 删除帖子（逻辑删除 + 权限校验）
+    public String deletePost(Long postId, Authentication authentication) {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (optionalPost.isEmpty()) {
+            return "帖子不存在";
+        }
+
+        Post post = optionalPost.get();
+        //当前登录用户名
+        String currentUsername = authentication.getName();
+        Optional<User> userOpt = userRepository.findByUsername(currentUsername);
+
+        if (userOpt .isEmpty()) {
+            return "用户身份无效";
+        }
+
+        // 如果是管理员 或 帖子作者本人 → 允许删除
+        User currentUser = userOpt .get();
+        boolean isAdmin = currentUser.getRole().equalsIgnoreCase("ADMIN");
+        boolean isAuthor = post.getAuthor() != null &&
+                post.getAuthor().getUsername().equals(currentUsername);
+
+        if (isAdmin || isAuthor) {
+            post.setDeleted(true);
+            postRepository.save(post);
+            return "删除成功";
+        }
+
+        return "权限不足，无法删除他人帖子";
     }
     // 获取版块下的所有帖子
     public List<Post> getPostsByBoard(Long boardId) {
