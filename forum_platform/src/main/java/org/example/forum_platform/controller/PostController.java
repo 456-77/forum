@@ -4,6 +4,7 @@ import org.example.forum_platform.dto.PostDTO;
 import org.example.forum_platform.entity.Post;
 import org.example.forum_platform.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,18 @@ public class PostController {
     public Post createPost(@RequestBody PostDTO post) {
         return postService.createPost(post);
     }
-    // 编辑帖子
+    // 编辑帖子（使用 PostDTO）
     @PutMapping("/{id}")
-    public Post updatePost(@PathVariable Long id, @RequestBody Post post) {
-        post.setId(id);
-        return postService.updatePost(post);
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostDTO postDTO) {
+        postDTO.setId(id); // 确保 ID 一致
+        try {
+            Post updatedPost = postService.updatePost(postDTO);
+            return ResponseEntity.ok(updatedPost);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(
+                    java.util.Map.of("success", false, "message", e.getMessage())
+            );
+        }
     }
     // 删除帖子
     @DeleteMapping("/{id}")

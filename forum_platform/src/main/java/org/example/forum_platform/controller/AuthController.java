@@ -63,7 +63,7 @@ public class AuthController {
                 response.put("avatar", foundUser.getAvatar());
                 response.put("email", foundUser.getEmail());
                 response.put("points", foundUser.getPoints());
-                response.put("level", 1); // 暂时写死，避免调用错误的方法
+                response.put("level", foundUser.getLevel());
 
                 return ResponseEntity.ok(response);
             } else {

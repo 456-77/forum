@@ -46,9 +46,34 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    // 编辑帖子
-    public Post updatePost(Post post) {
+    // 编辑帖子（使用 DTO）
+    public Post updatePost(PostDTO postDTO) {
+        Post post = postRepository.findById(postDTO.getId())
+                .orElseThrow(() -> new RuntimeException("帖子不存在"));
+
+        // 更新帖子内容
+        post.setTitle(postDTO.getTitle());
+        post.setContent(postDTO.getContent());
         post.setUpdateTime(LocalDateTime.now());
+        // 更新所属版块
+        if (postDTO.getBoardId() != null) {
+            Board board = boardRepository.findById(postDTO.getBoardId())
+                    .orElseThrow(() -> new RuntimeException("版块不存在"));
+            post.setBoard(board);
+        }
+
+        // 若用户ID存在，校验用户
+        if (postDTO.getUserId() != null) {
+            User user = userRepository.findById(postDTO.getUserId())
+                    .orElseThrow(() -> new RuntimeException("用户不存在"));
+            post.setAuthor(user);
+        }
+
+        // 更新图片链接（如果有）
+        if (postDTO.getImages() != null) {
+            post.setImageUrl(postDTO.getImages().toString());
+        }
+
         return postRepository.save(post);
     }
 

@@ -26,4 +26,12 @@ public class PostDTO {
     public Long getUserId() {
         return userId;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }
