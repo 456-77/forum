@@ -71,4 +71,18 @@ public class PostController {
         return postService.getAllPosts();
     }
 
+    // 获取指定用户的所有帖子
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getPostsByUser(@PathVariable Long userId) {
+        List<Post> posts = postService.getPostsByUserId(userId);
+
+        if (posts.isEmpty()) {
+            return ResponseEntity.status(404).body(
+                    java.util.Map.of("success", false, "message", "该用户没有发布帖子")
+            );
+        }
+
+        return ResponseEntity.ok(posts);
+    }
+
 }
