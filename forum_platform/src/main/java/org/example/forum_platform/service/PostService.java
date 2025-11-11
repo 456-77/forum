@@ -47,14 +47,21 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    // 编辑帖子（使用 DTO）
+    // 编辑帖子（使用 DTO）,支持部分更新
     public Post updatePost(PostDTO postDTO) {
         Post post = postRepository.findById(postDTO.getId())
                 .orElseThrow(() -> new RuntimeException("帖子不存在"));
 
-        // 更新帖子内容
-        post.setTitle(postDTO.getTitle());
-        post.setContent(postDTO.getContent());
+        // 标题更新
+        if (postDTO.getTitle() != null && !postDTO.getTitle().isBlank()) {
+            post.setTitle(postDTO.getTitle());
+        }
+
+        // 内容更新
+        if (postDTO.getContent() != null && !postDTO.getContent().isBlank()) {
+            post.setContent(postDTO.getContent());
+        }
+        // 更新时间
         post.setUpdateTime(LocalDateTime.now());
         // 更新所属版块
         if (postDTO.getBoardId() != null) {
